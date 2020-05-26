@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import javax.persistence.MappedSuperclass;
+import javax.validation.ConstraintViolationException;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -43,6 +44,8 @@ public class GenericController<
     public E inserir(E entityNova) {
         try {
             return repository.save(entityNova);
+        } catch (ConstraintViolationException e) {
+            throw GerarConstraintViolationException(e);
         } catch (Exception e) {
             throw new GenericSqlRuntimeException("Erro ao inserir registro no Banco de Dados.", e);
         }
@@ -74,6 +77,8 @@ public class GenericController<
     public E editar(E enditadeAEditar) {
         try {
             return repository.saveAndFlush(enditadeAEditar);
+        } catch (ConstraintViolationException e) {
+            throw GerarConstraintViolationException(e);
         } catch (Exception e) {
             throw new GenericSqlRuntimeException(e);
         }
@@ -118,12 +123,21 @@ public class GenericController<
 
         try {
             repository.deleteById(idEntity);
+        } catch (ConstraintViolationException e) {
+            throw GerarConstraintViolationException(e);
         } catch (DataIntegrityViolationException e) {
             throw new GenericSqlRuntimeException("Não é possível realizar a exclusão. O registro possui relacionamentos no sistema.", e);
         } catch (Exception e) {
             throw new GenericSqlRuntimeException(e);
         }
-
     }
 
+    public static GenericRuntimeException GerarConstraintViolationException(ConstraintViolationException e) {
+        StringBuilder stringBuilder = new StringBuilder();
+        e.getConstraintViolations().forEach(constraintViolation -> {
+            stringBuilder.append(constraintViolation.getMessageTemplate());
+            stringBuilder.append(" ");
+        });
+        return new GenericRuntimeException(stringBuilder.toString(), e);
+    }
 }

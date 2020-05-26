@@ -16,7 +16,7 @@ public class GenericSqlRuntimeException extends GenericRuntimeException {
     }
 
     public GenericSqlRuntimeException(String s, Exception e) {
-        super(s, e.getCause());
+        super(s + e.getMessage(), e.getCause());
     }
 
     @Override

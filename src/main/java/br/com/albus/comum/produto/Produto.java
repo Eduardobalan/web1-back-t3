@@ -8,6 +8,7 @@ import br.com.albus.generic.GenericEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.lang.NonNull;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
@@ -15,12 +16,19 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Negative;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
+import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "TB_PRODUTO", schema = "public")
@@ -38,23 +46,32 @@ public class Produto extends GenericEntity<Long> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "PRO_NOME")
+    @Column(name = "PRO_NOME", length = 255, nullable = false)
+    @Size(min = 5, max = 255, message = "O nome deve ser maior que 5 e menor que 255 digitos.")
     private String nome;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PRO_CATEGORIA")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @NotNull(message = "Categoria não pode ser null.")
+    @JoinColumn(name = "PRO_CATEGORIA", nullable = false, foreignKey = @ForeignKey(name = "FK_CATEGORIA_IN_PRODUTO"))
     private Categoria categoria;
 
-    @Column(name = "PRO_QUANTIDADE")
+    @Column(name = "PRO_QUANTIDADE", nullable = false)
+    @NotNull(message = "Quantidade não pode ser null.")
+    @PositiveOrZero(message = "Quantidade não pode ser negativa.")
     private Long quantidade;
 
-    @Column(name = "PRO_DESCRICAO")
+    @Column(name = "PRO_DESCRICAO", length = 1000)
+    @Size(max = 1000, message = "A descricao deve ser menor que 1000 digitos.")
     private String descricao;
 
-    @Column(name = "PRO_CUSTO")
+    @Column(name = "PRO_CUSTO", nullable = false)
+    @NotNull(message = "Custo não pode ser null.")
+    @PositiveOrZero(message = "Custo não pode ser negativa.")
     private Double custo;
 
-    @Column(name = "PRO_VALOR_DE_VENDA")
+    @Column(name = "PRO_VALOR_DE_VENDA", nullable = false)
+    @NotNull(message = "Valor de venda não pode ser null.")
+    @PositiveOrZero(message = "Valor de venda não pode ser negativa.")
     private Double valorDeVenda;
 
     @Column(name = "PRO_URL_IMG")

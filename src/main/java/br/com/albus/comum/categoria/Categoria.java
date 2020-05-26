@@ -19,6 +19,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "TB_CATEGORIA", schema = "public")
@@ -37,13 +39,17 @@ public class Categoria extends GenericEntity<Long> {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "CAT_TIPO_CATEGORIA")
+    @Column(name = "CAT_TIPO_CATEGORIA", nullable = false)
+    @NotNull
     private EnumTipoCategoria tipoCategoria;
 
-    @Column(name = "CAT_NOME")
+    @Column(name = "CAT_NOME",  nullable = false, length = 255)
+    @NotNull
+    @Size(min = 3, max = 255, message = "O nome deve ser maior que 5 e menor que 255 digitos.")
     private String nome;
 
-    @Column(name = "CAT_DESCRICAO")
+    @Column(name = "CAT_DESCRICAO", length = 1000)
+    @Size(max = 1000, message = "A descricao deve ser menor que 1000 digitos.")
     private String descricao;
 
     @Override
